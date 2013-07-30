@@ -1,6 +1,6 @@
 <?php use \KrowdByz\controllers\SessionController; ?>
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="en" class="no-js">
 
 <head>
@@ -8,12 +8,13 @@
 
         <script src="assets/js/jquery.min.js"></script>
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+		<link rel="stylesheet" href="assets/css/bootstrap.css">
         <link rel="stylesheet" href="assets/css/timeTo.css">
  	<link rel="stylesheet" href="assets/css/custom.css">
 	<script src="assets/js/modernizr.js"></script>
 </head>
 
-<body>
+<body >
   
   <?php require("navbar.php") ?>
   

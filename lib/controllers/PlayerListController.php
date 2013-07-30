@@ -29,7 +29,9 @@ class PlayerListController {
   public static function show($categoryID) {
     return PlayerList::findPlayers($categoryID);
   }
-  
+  public static function showLeaders($categoryID,$numLeaders) {
+    return PlayerList::findLeaders($categoryID,$numLeaders);
+  }
 }
 
 ?>

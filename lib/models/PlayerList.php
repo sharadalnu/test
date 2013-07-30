@@ -25,7 +25,32 @@ class PlayerList {
 	  
 	  return '';
   }
-  
+  	public static function findLeaders($categoryID,$numLeaders)
+	{
+		$players = array();
+		$statement = Database::databaseInstance()->prepare("SELECT player_name, score FROM scoreboard WHERE category_id = ? order by score desc limit ?;");
+		if (!$statement) {
+		  die("Could not retrieve leaders");
+		}
+		$statement->bind_param('ii', $categoryID, $numLeaders);
+
+		$ret = $statement->execute();
+		
+		if (!$ret) {
+		  die("Could not retrieve leaders");
+		}
+		
+		$statement->bind_result($username, $score);
+		while ($statement->fetch()) {
+		  
+		  
+			array_push($players, array(
+			                      'username' => $username,
+			                      'score' => $score
+			));
+		}
+		return $players;
+	}
   public static function findPlayers($categoryID) {
     $players = array();
 

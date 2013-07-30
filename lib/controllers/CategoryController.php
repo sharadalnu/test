@@ -17,7 +17,7 @@ class CategoryController {
   }
   
   private static function calculateColors($amount) {
-    $rainbow = ["green", "orange", "blue"]; // available colors
+    $rainbow = array ("green", "orange", "blue"); // available colors
     $colors = array();
     for ($i = 0; $i < $amount; $i++) {
       array_push($colors, $rainbow[$i % count($rainbow)]);

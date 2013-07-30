@@ -4,8 +4,8 @@
 #scoretest{text-align:center;}
 #scoretest p{font-size:20px}
 #myModal{
-width:900px;
-margin-left:-450px;
+width:70%;
+
 }
 .answerbtn  {
 margin:1px;
@@ -24,7 +24,7 @@ border: 1px solid #cccccc;
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
-		    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+            -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
      -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
@@ -43,7 +43,7 @@ border: 2px solid #742EFF;
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
-		    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+            -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
      -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 background-color:#FFFFFF;
@@ -64,13 +64,13 @@ background-color:#FFFFFF;
                     num: 10
                 },
                 function(data){
-				    current_position = 10;
+                    current_position = 10;
                     console.log(data);
-					getQuestion(--current_position);
-					
+                    getQuestion(--current_position);
+                    
                 }
-				
-				);
+                
+                );
                
             }
 
@@ -81,10 +81,14 @@ background-color:#FFFFFF;
                 },
                 function(data) {
                     var question = JSON.parse(data);
-					$("#qno").text(10-idx+" /10");
+					$("#test_skill").text($('#category').text());
+					if($('#game_mode').text()=='pvp'){
+					$("#test_opponet").text("Opponent: "+opponent);
+					}
+                    $("#qno").text(10-idx+" /10");
                     $("#question").val(question.question.id);
                     $("#question").text(question.question.text);
-					$('#test').show();  
+                    $('#test').show();  
                     var options = "";
                     $.each(question.options, function(i, elem) {
                         options = options + '<button id="answers" type="button" class="answerbtn" value="' + elem.id + '" onClick="next($(this).val())">' + elem.text + '</button><br>';
@@ -94,72 +98,101 @@ background-color:#FFFFFF;
                     if ($('#timer').is(':empty')) {
                         $('#timer').timeTo(timeLimit, function(result){
                             submitAnswers(result);
-							var answers = {};
+                            var answers = {};
                             var timeLimit = 300;
                         });
                         $('#timer div:first').hide();
                         $('#timer div:nth-child(2)').hide();
                         $('#timer span:first').hide();
                     }
-					//---------------
+                    //---------------
                 });
                 
             }
-            
+
             function next(val) {
-            	question_id = $('#question').val();
+                question_id = $('#question').val();
                 answer_id = val;
-            	answers[question_id] = answer_id;
-            	console.log(answers);
-            	
-            	if (current_position == 0) {
-			$('#timer').timeTo('stop', function(data) {
-                   		submitAnswers(data);
-			})
-            	}
-            	else getQuestion(--current_position);
+                answers[question_id] = answer_id;
+                console.log(answers);
+                
+                if (current_position == 0) {
+				    
+                    $('#timer').timeTo('stop', function(data) {
+					    usingtime=data;
+                                     });
+					submitAnswers(usingtime);
+                }
+                else { 
+                    setTimeout(function() {}, 200);
+                    getQuestion(--current_position);
+                }
             }
             
             function begin() {
-			    createGame();
-				
+            createGame();           
                 $("#entryForm").hide();
                 
             }
             
             function submitAnswers(timeUsed)
-            {
-            	submittedAnswers = JSON.stringify(answers);
-            	$.post('play.php', {
-            	    action: 'submitAnswers',
-            	    answers: submittedAnswers
-            	},
-            	function (data) {
-            	    result = JSON.parse(data);
-					$('#test').hide();
-					
+            {   
+                submittedAnswers = JSON.stringify(answers);
+                answers={};
+                $("#timer").empty();
+                $.post('play.php', {
+                    action: 'submitAnswers',
+                    answers: submittedAnswers
+                },
+                function (data) {
+                    result = JSON.parse(data);
+                    $('#test').hide();					
+                    if($('#game_mode').text()=='pvs'){ 					//pvs part
                     if (timeUsed >= timeLimit) {
                         $('#timeout').show();
-						setTimeout(function(){
-						$('#timeout').hide();
-						$('#result').show();
-						$('#result p').html('<br>Correct: ' + result.correct + '<br> wrong: ' + result.wrong);},1500);
-						
-                    } else {
-					    $('#result').show();
+                        setTimeout(function(){
+                        $('#timeout').hide();
+                        $('#result').show();
+                        $('#result p').html('<br>Correct: ' + result.correct + '<br> wrong: ' + result.wrong);},1500);
+                        
+                    } else {                       
                         $('#result p').html('<br>Finished in ' + timeUsed + 's<br> ' +  'Correct: ' + result.correct + '<br> Wrong: ' + result.wrong);
+						$('#result').show();
                     }
-		    //			statusfree();
-            
-			//		location.reload();
-            	});
+                  }
+				  else if($('#game_mode').text()=='pvp')  //pvp part
+				  {
+				   //console.log(result.correct);
+				   //console.log(timeUsed);
+				   usingtime=timeUsed;
+				   if (timeUsed >= timeLimit) { 
+				      $('#timeout').show();
+				      setTimeout(function(){
+                        $('#timeout').hide();                        
+				        end(result, timeUsed);
+						$('#result').show();
+						},1500);
+						}
+					else {
+					   end(result, timeUsed);
+					   $('#result').show();
+				   }
+				   
+				  
+				   
+				   }
+				  
+                });
             }
 
 $('#PvS').click(function()
 
 {
+  $('#game_mode').text('pvs');
   $('#myModal .modal-body #entryForm h3').text('Dear '+getUsername()+',');  
   $('#myModal .modal-body #entryForm p').text('This will be a test about '+$('#category').text()+'. Are you ready?');
+  $('#myModal .modal-body #entryForm input').show();
+  $('#myModal .modal-body #entryForm button').show();
   $('#myModal .modal-body #test').hide();
   $('#result').hide(); 
   $("#entryForm").show(); 
@@ -175,34 +208,37 @@ $('#PvS').click(function()
 <div id="myModal" class="modal hide fade" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   
   <div class="modal-body">
-	    <div id='timeout' class='hide'><h1>Time Out</h1></div>
+        <input id="game_mode" type="hidden">
+        <div id='timeout' class='hide'><h1>Time Out</h1></div>
         <div id="result">
-		    <div class="modal-header">
-				<button type="button" onclick="statusfree();" class="close" data-dismiss="modal" aria-hidden="true">X</button>
-				<h3 id="myModalLabel">Score</h3>
-		    </div>
-			<div id="scoretest">
-			<p></p>
-			<br>
-			<button class="btn btn-info" onclick="statusfree();" data-dismiss="modal" aria-hidden="true">Close</button>
-			</div>
-		</div>
+            <div class="modal-header">
+                <button type="button" onclick="statusfree();" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                <h3 id="myModalLabel">Score</h3>
+            </div>
+            <div id="scoretest">
+            <p></p>
+            <br>
+            <button class="btn btn-info" onclick="statusfree();" data-dismiss="modal" aria-hidden="true">Close</button>
+			<a href="ssi.php">&nbsp Change skill?</a>
+            </div>
+        </div>
         <form id="entryForm">
-			<h3></h3>
-			<p class='lead'></p>
-			<input type="button" class='btn-large btn-warning' value="Begin" onClick="begin()">
-			<button class="btn-large btn-info" onclick="statusfree();insert_db();" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <h3></h3>
+            <p class='lead'></p>
+            <input type="button" class='btn-large btn-warning' value="Begin" onClick="begin()">
+            <button class="btn-large btn-info" onclick="statusfree();insert_db();" data-dismiss="modal" aria-hidden="true">Cancel</button>
         </form>
-		<div id="test">
+        <div id="test">
+		    <div id="test_skill" style="display:inline"></div><div id="test_opponet" style="display:inline;float:right"></div>
 			<p id="timer"></p>
 			<p id='qno'></p>
-			<p id="question"></p>
-			<br>
-			<p id="options"></p>
-		</div>
+            <p id="question"></p>
+            <br>
+            <p id="options"></p>
+        </div>
   </div>
   <div class="modal-footer">
   </div>
 </div>
-	
-	
+    
+    

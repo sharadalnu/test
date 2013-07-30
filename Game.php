@@ -23,7 +23,7 @@ class Game
         $this->fetchOptions($num);
         //$this->writeToGamePlayer();
        // $this->writeToPlayerList();
-        // $this->writeQuestionsToGameQuestion();
+       // $this->writeQuestionsToGameQuestion();
     }
     
     public static function score($submittedAnswers)
@@ -33,6 +33,7 @@ class Game
         $answers = json_decode($submittedAnswers, true);
         $total = count($answers);
         $correct = 0;
+		$wrong = 0;
 
         // Check whether player’s answer is correct from db
         
@@ -43,10 +44,12 @@ class Game
                                 WHERE id=$answer_id;");
             //$result = $stmt->fetch(PDO::FETCH_ASSOC);
             $result = $stmt->fetch_array(MYSQLI_ASSOC);
+			//echo $result['correct'];
             if ($result['correct'] == 1) $correct++;
+			else if ($result['correct'] == 0) $wrong++;
         }
         
-        $wrong = $total - $correct;
+       
 
         $ret['correct'] = $correct;
         $ret['wrong'] = $wrong;
@@ -60,17 +63,19 @@ class Game
         $dbh = new mysqli($hostname, $username,$password,$dbname);
 
         // remove user from game_player table
-        $stmt = $dbh->prepare("DELETE FROM game_player WHERE game_id=$gameId;");
-        $stmt->execute();
+        //$stmt = $dbh->prepare("DELETE FROM game_player WHERE game_id=$gameId;");
+       // $stmt->execute();
 
         // change user's status to '0' from player_list table
+		date_default_timezone_set('America/Los_Angeles');
+		$time=date("YmdHis");
         $stmt = $dbh->prepare("UPDATE player_list 
-                                SET status=0 
+                                SET status=0,time=$time
                                 WHERE username='$playerId';");
         $stmt->execute();
 
         $dbh = null;
-
+        
         unset($_SESSION['gameId']);
         unset($_SESSION['playerId']);
         unset($_SESSION['questions']);
@@ -114,13 +119,13 @@ class Game
 		    $text = $result['text'];
 			if($this->check($questionId)==0)
 			{
-			
-            $this->questions[$i]['question']['id'] = $questionId;
+			$this->questions[$i]['question']['id'] = $questionId;
             $this->questions[$i]['question']['text'] = $text;
 		    $i++;
 			
 			}
         }
+		
     }
     private function check($id)
 	{

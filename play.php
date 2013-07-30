@@ -15,8 +15,14 @@ switch ($_POST['action']) {
         $_SESSION['gameId'] = $game->getId();
         $_SESSION['playerId'] = $_POST['playerId'];
         $_SESSION['questions'] = $game->getQuestions();
-		echo 'game created';
+		
+		echo json_encode($_SESSION['questions']);
         break;
+	case 'putQuestiontoSession':
+	    $_SESSION['gameId'] = 'PvP';
+        $_SESSION['playerId'] = $_SESSION['player_username'];
+	    $_SESSION['questions'] = json_decode($_POST['questions']);
+	    break;
         
     case 'getQuestion':
         echo json_encode($_SESSION['questions'][$_POST['index']]);
@@ -24,7 +30,8 @@ switch ($_POST['action']) {
         
     case 'submitAnswers':
         echo Game::score($_POST['answers']);
-        Game::endGame($_SESSION['gameId'], $_SESSION['playerId']);
+		Game::endGame($_SESSION['gameId'], $_SESSION['playerId']);
+		
         break;
     
     default:
