@@ -516,6 +516,7 @@ function createPvPGame(username) {
 
 $('#player_list_table').mouseover(function(){
 updatelist();
+inactive_check();
 if ($('#message-list tbody').html()=="")
 {document.getElementById('player_list_table').style.width = '80%';
 }
@@ -668,4 +669,27 @@ function insert_into_db(localtime,username,time,catid,correct,opponent,winbool) 
                     win:winbool
                     }
           });
+}
+function inactive_check()
+{      
+	playertable=$('#player-list tbody').text();
+	username=getUsername();
+	//alert(playertable.indexOf(username));
+	if(playertable.indexOf(username)==-1 &&  $('#Out').css('display')=="block")
+	{
+	 $('#myModal .modal-body #entryForm h3').html('<center> you have been logged off. Click to refresh</center>');
+	 $('#myModal .modal-body #entryForm button').hide();
+	 $('#myModal .modal-body #entryForm input').hide();
+	 $("#entryForm").show(); 
+	 $('#myModal .modal-body #test').hide();
+	 $('#result').hide(); 
+	 $("#myModal").modal({backdrop:'static'});
+     var e = document.createElement('input');
+	 e.type="button";
+	 e.value = "Online";
+	 e.onclick=function(){location.reload();};	
+	 $("#entryForm").append(e);
+	 return true;
+	}
+	
 }
