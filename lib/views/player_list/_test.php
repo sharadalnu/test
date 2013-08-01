@@ -219,10 +219,11 @@ $("#input_email").html("<p>Input your friends email: <input id='f_email' type='t
 }
 
 function sending_email(){
+email=$("#f_email").val();
 $("#input_email").html("Sending ... ");
 $.post('play.php', {
 		action: 'sendemail',
-		email: $("#f_email").val(),
+		email:email ,
 		usedtime:$("#r_usedtime").text(),
 		correct:$("#r_correct").text(),
 		categoryId: $('#category').attr("name")
