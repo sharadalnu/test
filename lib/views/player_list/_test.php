@@ -1,4 +1,5 @@
 <style>
+button {margin-bottom:5px;}
 #timer{text-align:center;}
 #timeout{color:#FF0066;height:200px;margin-top:130px;text-align:center;}
 #scoretest{text-align:center;}
@@ -130,11 +131,15 @@ background-color:#FFFFFF;
             }
             
             function begin() {
-            createGame();           
+                createGame();           
                 $("#entryForm").hide();
                 
             }
-            
+            function pvsend()
+			{$.post('play.php', {
+                    action: 'endgame'					
+                });
+			}
             function submitAnswers(timeUsed)
             {   
                 submittedAnswers = JSON.stringify(answers);
@@ -142,22 +147,27 @@ background-color:#FFFFFF;
                 $("#timer").empty();
                 $.post('play.php', {
                     action: 'submitAnswers',
+					mode:$('#game_mode').text(),
                     answers: submittedAnswers
                 },
                 function (data) {
                     result = JSON.parse(data);
-                    $('#test').hide();					
+                    $('#test').hide();
+                    					
                     if($('#game_mode').text()=='pvs'){ 					//pvs part
+					usingtime=timeUsed;
                     if (timeUsed >= timeLimit) {
                         $('#timeout').show();
                         setTimeout(function(){
                         $('#timeout').hide();
                         $('#result').show();
+						$('#pvs_buttons').show();
                         $('#result p').html('<br>Correct: ' + result.correct + '<br> wrong: ' + result.wrong);},1500);
                         
                     } else {                       
-                        $('#result p').html('<br>Finished in ' + timeUsed + 's<br> ' +  'Correct: ' + result.correct + '<br> Wrong: ' + result.wrong);
+                        $('#result p').html('<br>Finished in <i id="r_usedtime">' + timeUsed + '</i>s<br> ' +  'Correct: <i id="r_correct">' + result.correct + '</i><br> Wrong: ' + result.wrong);
 						$('#result').show();
+						$('#pvs_buttons').show();
                     }
                   }
 				  else if($('#game_mode').text()=='pvp')  //pvp part
@@ -171,11 +181,13 @@ background-color:#FFFFFF;
                         $('#timeout').hide();                        
 				        end(result, timeUsed);
 						$('#result').show();
+						$('#pvs_buttons').hide();
 						},1500);
 						}
 					else {
 					   end(result, timeUsed);
 					   $('#result').show();
+					   $('#pvs_buttons').hide();
 				   }
 				   
 				  
@@ -200,7 +212,26 @@ $('#PvS').click(function()
       
 });
 
+function send_email(){
+$("#input_email").html("<p>Input your friends email: <input id='f_email' type='text'><button onclick='sending_email()' id='s_email' class='btn'>Send</button>");
 
+
+}
+
+function sending_email(){
+$("#input_email").html("Sending ... ");
+$.post('play.php', {
+		action: 'sendemail',
+		email: $("#f_email").val(),
+		usedtime:$("#r_usedtime").text(),
+		correct:$("#r_correct").text(),
+		categoryId: $('#category').attr("name")
+      },
+	  function(data){
+	  $("#input_email").html("Send");
+	  $("#email").hide();
+	  });
+	  }
 
         </script>
 
@@ -218,8 +249,14 @@ $('#PvS').click(function()
             <div id="scoretest">
             <p></p>
             <br>
-            <button class="btn btn-info" onclick="statusfree();" data-dismiss="modal" aria-hidden="true">Close</button>
-			<a href="ssi.php">&nbsp Change skill?</a>
+			<div id='pvs_buttons'>
+			<button id='fb' class='btn' onclick="shareonFB()">Show off on Facebook</button><br>
+			<button id='email' class='btn' href="#" onclick="send_email()">Invite your friend to the game!</button>
+			<div id="input_email"></div>
+			</div>
+            
+			<button class="btn btn-info" onclick="statusfree();" data-dismiss="modal" aria-hidden="true">Close</button>
+			<br><a href="ssi.php">&nbsp Change skill?</a>
             </div>
         </div>
         <form id="entryForm">
