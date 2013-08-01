@@ -26,6 +26,7 @@ function statusfree()     //set the status is free
    playerFinished = false;
    o_finish=false;
    opponent='';
+   if($("#game_mode").text()=="pvs") pvsend();
    document.getElementById("PvP").disabled=false;
    $('#PvP').removeClass('disabled');
    if (sess) {
