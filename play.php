@@ -1,6 +1,5 @@
 <?php
 require_once 'Game.php';
-
 session_start();
 
 switch ($_POST['action']) {
@@ -30,9 +29,22 @@ switch ($_POST['action']) {
         
     case 'submitAnswers':
         echo Game::score($_POST['answers']);
+		if($_POST['mode']=='pvp')
 		Game::endGame($_SESSION['gameId'], $_SESSION['playerId']);
-		
-        break;
+		break;
+	case 'endgame':
+	    Game::endGame($_SESSION['gameId'], $_SESSION['playerId']);
+		break;
+	case 'sendemail':
+	    Game::writeQuestionsToGameQuestion($_SESSION['playerId'],$_SESSION['gameId'],$_SESSION['questions']);
+	    Game::writeToGamePlayer($_SESSION['gameId'],$_SESSION['playerId'],$_POST['correct'],$_POST['usedtime'],$_POST['categoryId']);
+		$to=$_POST['email'];
+		$subject = "You get an invite from ".$_SESSION['playerId'];
+		$message="Hi! ";
+		$from ="anyunww@gmail.com";
+		$headers="From:".$from;
+		mail($to,$subject,$message,$headers);        
+		break;
     
     default:
         echo 'ERROR!';
