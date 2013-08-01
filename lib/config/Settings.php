@@ -7,8 +7,8 @@ class Settings {
   public static $DATABASE = array(
     'host'      => 'localhost',
     'name'      => 'game',
-    'username'  => 'root',
-    'password'  => '',
+    'username'  => 'udaya',
+    'password'  => 'password',
    
   );
   
