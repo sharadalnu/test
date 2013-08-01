@@ -162,31 +162,28 @@ class Game
         }
     }
     
-    private function writeToGamePlayer()
-    {
-        // TODO: we should check whether the game_id is duplicated
-        $stmt = $this->dbh->prepare("INSERT INTO game_player
-                                    VALUES ($this->id, $this->playerId, 0, 0, 0, 0, 0, $this->categoryId);");
+    public static function writeToGamePlayer($gameid,$player,$correct,$usedtime,$category)
+    {   global $hostname,$username, $password, $dbname;
+        $dbh = new mysqli($hostname, $username,$password,$dbname);       
+        $stmt = $dbh->prepare("INSERT INTO game_player
+                                    VALUES ('$gameid', '$player', $correct, '$usedtime', $category);");
         $stmt->execute();
     }
     
-    private function writeToPlayerList()
-    {
-        $stmt = $this->dbh->prepare("INSERT INTO player_list
-                                    VALUES ($this->categoryId, $this->playerId, 1);");
-        $stmt->execute();
-    }
+  
     
-    private function writeQuestionsToGameQuestion()
-    {
-        $stmt = $this->dbh->prepare("INSERT INTO game_question
-                                    VALUES ($this->id, :questionId, :questionText);");
-        
-        foreach ($this->questions as $question) {
-            $stmt->bindValue(':questionId', $question['question']['id']);
-            $stmt->bindValue(':questionText', $question['question']['text']);
-            $stmt->execute();
-        }
+    public static function writeQuestionsToGameQuestion($player,$gameid,$questions)
+    {   global $hostname,$username, $password, $dbname;
+        $dbh = new mysqli($hostname, $username,$password,$dbname);
+		
+		foreach($questions as $question){
+		$qid= $question['question']['id'];
+		$qtext=$question['question']['text'];
+		$stmt = $dbh->prepare("INSERT INTO game_question
+                                    VALUES ('$gameid','$qid','$qtext');");
+		$stmt->execute();
+		}
+
     }
 }
 ?>
